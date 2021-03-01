@@ -127,11 +127,7 @@ class Router(BaseRouter):
             unquote=unquote,
         )
 
-        if isinstance(host, str):
-            hosts = [host]
-        else:
-            hosts = host or [None]  # type: ignore
-
+        hosts = [host] if isinstance(host, str) else host or [None]
         routes = []
 
         for host in hosts:

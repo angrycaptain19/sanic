@@ -117,7 +117,7 @@ class RouteMixin:
             route = FutureRoute(
                 handler,
                 uri,
-                None if websocket else frozenset([x.upper() for x in methods]),
+                None if websocket else frozenset(x.upper() for x in methods),
                 host,
                 strict_slashes,
                 stream,
@@ -129,6 +129,7 @@ class RouteMixin:
                 unquote,
                 static,
             )
+
 
             self._future_routes.add(route)
 
@@ -702,20 +703,19 @@ class RouteMixin:
 
             if request.method == "HEAD":
                 return HTTPResponse(headers=headers)
-            else:
-                if stream_large_files:
-                    if type(stream_large_files) == int:
-                        threshold = stream_large_files
-                    else:
-                        threshold = 1024 * 1024
+            if stream_large_files:
+                if type(stream_large_files) == int:
+                    threshold = stream_large_files
+                else:
+                    threshold = 1024 * 1024
 
-                    if not stats:
-                        stats = await stat_async(file_path)
-                    if stats.st_size >= threshold:
-                        return await file_stream(
-                            file_path, headers=headers, _range=_range
-                        )
-                return await file(file_path, headers=headers, _range=_range)
+                if not stats:
+                    stats = await stat_async(file_path)
+                if stats.st_size >= threshold:
+                    return await file_stream(
+                        file_path, headers=headers, _range=_range
+                    )
+            return await file(file_path, headers=headers, _range=_range)
         except ContentRangeError:
             raise
         except Exception:

@@ -206,12 +206,10 @@ class Sanic(BaseSanic):
             **response** - Invoke before the response is returned back
         :return: decorated method
         """
-        if attach_to == "request":
-            if middleware not in self.request_middleware:
-                self.request_middleware.append(middleware)
-        if attach_to == "response":
-            if middleware not in self.response_middleware:
-                self.response_middleware.appendleft(middleware)
+        if attach_to == "request" and middleware not in self.request_middleware:
+            self.request_middleware.append(middleware)
+        if attach_to == "response" and middleware not in self.response_middleware:
+            self.response_middleware.appendleft(middleware)
         return middleware
 
     def register_named_middleware(
@@ -445,11 +443,7 @@ class Sanic(BaseSanic):
 
         if external:
             if not scheme:
-                if ":" in netloc[:8]:
-                    scheme = netloc[:8].split(":", 1)[0]
-                else:
-                    scheme = "http"
-
+                scheme = netloc[:8].split(":", 1)[0] if ":" in netloc[:8] else "http"
             if "://" in netloc[:8]:
                 netloc = netloc.split("://", 1)[-1]
 
@@ -667,8 +661,6 @@ class Sanic(BaseSanic):
                 getattr(handler, "__blueprintname__", "") + handler.__name__
             )
 
-            pass
-
         if self.asgi:
             ws = request.transport.get_websocket_connection()
         else:
@@ -785,9 +777,10 @@ class Sanic(BaseSanic):
                 "#asynchronous-support"
             )
 
-        if auto_reload or auto_reload is None and debug:
-            if os.environ.get("SANIC_SERVER_RUNNING") != "true":
-                return reloader_helpers.watchdog(1.0)
+        if (auto_reload or auto_reload is None and debug) and os.environ.get(
+            "SANIC_SERVER_RUNNING"
+        ) != "true":
+            return reloader_helpers.watchdog(1.0)
 
         if sock is None:
             host, port = host or "127.0.0.1", port or 8000

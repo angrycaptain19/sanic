@@ -19,7 +19,7 @@ print(json({"test": True}).output())
 print("Running New 100,000 times")
 times = 0
 total_time = 0
-for n in range(6):
+for _ in range(6):
     time = timeit.timeit(
         'json({ "test":True }).output()',
         setup="from sanic.response import json",
@@ -33,7 +33,7 @@ print("Average: {}".format(total_time / times))
 print("Running Old 100,000 times")
 times = 0
 total_time = 0
-for n in range(6):
+for _ in range(6):
     time = timeit.timeit(
         'json({ "test":True }).output_old()',
         setup="from sanic.response import json",
