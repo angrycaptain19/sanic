@@ -165,9 +165,6 @@ class WebSocketConnection:
 
         if message["type"] == "websocket.receive":
             return message["text"]
-        elif message["type"] == "websocket.disconnect":
-            pass
-
         return None
 
     receive = recv
@@ -176,9 +173,7 @@ class WebSocketConnection:
         await self._send(
             {
                 "type": "websocket.accept",
-                "subprotocol": ",".join(
-                    [subprotocol for subprotocol in self.subprotocols]
-                ),
+                "subprotocol": ",".join(self.subprotocols),
             }
         )
 

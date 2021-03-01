@@ -274,10 +274,10 @@ class Request:
 
         :return: token related to request
         """
-        prefixes = ("Bearer", "Token")
         auth_header = self.headers.get("Authorization")
 
         if auth_header is not None:
+            prefixes = ("Bearer", "Token")
             for prefix in prefixes:
                 if prefix in auth_header:
                     return auth_header.partition(prefix)[-1].strip()
@@ -350,21 +350,23 @@ class Request:
         :type errors: str
         :return: RequestParameters
         """
-        if not self.parsed_args[
-            (keep_blank_values, strict_parsing, encoding, errors)
-        ]:
-            if self.query_string:
-                self.parsed_args[
-                    (keep_blank_values, strict_parsing, encoding, errors)
-                ] = RequestParameters(
-                    parse_qs(
-                        qs=self.query_string,
-                        keep_blank_values=keep_blank_values,
-                        strict_parsing=strict_parsing,
-                        encoding=encoding,
-                        errors=errors,
-                    )
+        if (
+            not self.parsed_args[
+                (keep_blank_values, strict_parsing, encoding, errors)
+            ]
+            and self.query_string
+        ):
+            self.parsed_args[
+                (keep_blank_values, strict_parsing, encoding, errors)
+            ] = RequestParameters(
+                parse_qs(
+                    qs=self.query_string,
+                    keep_blank_values=keep_blank_values,
+                    strict_parsing=strict_parsing,
+                    encoding=encoding,
+                    errors=errors,
                 )
+            )
 
         return self.parsed_args[
             (keep_blank_values, strict_parsing, encoding, errors)
@@ -406,19 +408,21 @@ class Request:
         :type errors: str
         :return: list
         """
-        if not self.parsed_not_grouped_args[
-            (keep_blank_values, strict_parsing, encoding, errors)
-        ]:
-            if self.query_string:
-                self.parsed_not_grouped_args[
-                    (keep_blank_values, strict_parsing, encoding, errors)
-                ] = parse_qsl(
-                    qs=self.query_string,
-                    keep_blank_values=keep_blank_values,
-                    strict_parsing=strict_parsing,
-                    encoding=encoding,
-                    errors=errors,
-                )
+        if (
+            not self.parsed_not_grouped_args[
+                (keep_blank_values, strict_parsing, encoding, errors)
+            ]
+            and self.query_string
+        ):
+            self.parsed_not_grouped_args[
+                (keep_blank_values, strict_parsing, encoding, errors)
+            ] = parse_qsl(
+                qs=self.query_string,
+                keep_blank_values=keep_blank_values,
+                strict_parsing=strict_parsing,
+                encoding=encoding,
+                errors=errors,
+            )
         return self.parsed_not_grouped_args[
             (keep_blank_values, strict_parsing, encoding, errors)
         ]
@@ -700,7 +704,7 @@ def parse_multipart_form(body, boundary):
         field_name = None
         line_index = 2
         line_end_index = 0
-        while not line_end_index == -1:
+        while line_end_index != -1:
             line_end_index = form_part.find(b"\r\n", line_index)
             form_line = form_part[line_index:line_end_index].decode("utf-8")
             line_index = line_end_index + 2

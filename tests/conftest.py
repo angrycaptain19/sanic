@@ -63,12 +63,7 @@ class RouteStringGenerator:
         routes = []
         for depth in range(1, max_route_depth + 1):
             for _ in range(self.ROUTE_COUNT_PER_DEPTH):
-                route = "/".join(
-                    [
-                        TYPE_TO_GENERATOR_MAP.get("string")()
-                        for _ in range(depth)
-                    ]
-                )
+                route = "/".join(TYPE_TO_GENERATOR_MAP.get("string")() for _ in range(depth))
                 route = route.replace(".", "", -1)
                 route_detail = (random.choice(self.HTTP_METHODS), route)
 
@@ -80,15 +75,10 @@ class RouteStringGenerator:
         routes = []
         for method, route in current_routes:
             current_length = len(route.split("/"))
-            new_route_part = "/".join(
-                [
-                    "<{}:{}>".format(
+            new_route_part = "/".join("<{}:{}>".format(
                         TYPE_TO_GENERATOR_MAP.get("string")(),
                         random.choice(self.ROUTE_PARAM_TYPES),
-                    )
-                    for _ in range(max_route_depth - current_length)
-                ]
-            )
+                    ) for _ in range(max_route_depth - current_length))
             route = "/".join([route, new_route_part])
             route = route.replace(".", "", -1)
             routes.append((method, route))
@@ -141,5 +131,4 @@ def url_param_generator():
 
 @pytest.fixture(scope="function")
 def app(request):
-    app = Sanic(request.node.name)
-    return app
+    return Sanic(request.node.name)

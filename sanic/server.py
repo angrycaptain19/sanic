@@ -165,7 +165,7 @@ class HttpProtocol(asyncio.Protocol):
         self.keep_alive_timeout = self.app.config.KEEP_ALIVE_TIMEOUT
         self.request_max_size = self.app.config.REQUEST_MAX_SIZE
         self.request_class = self.app.request_class or Request
-        self.state = state if state else {}
+        self.state = state or {}
         if "requests_count" not in self.state:
             self.state["requests_count"] = 0
         self._data_received = asyncio.Event()
@@ -408,8 +408,7 @@ class AsyncioServer:
         if self.server:
             self.server.close()
             coro = self.wait_closed()
-            task = asyncio.ensure_future(coro, loop=self.loop)
-            return task
+            return asyncio.ensure_future(coro, loop=self.loop)
 
     def start_serving(self):
         if self.server:

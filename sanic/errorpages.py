@@ -263,13 +263,12 @@ class TextRenderer(BaseRenderer):
 
     def _format_exc(self, exc):
         frames = "\n\n".join(
-            [
-                f"{self.SPACER * 2}File {frame.filename}, "
-                f"line {frame.lineno}, in "
-                f"{frame.name}\n{self.SPACER * 2}{frame.line}"
-                for frame in extract_tb(exc.__traceback__)
-            ]
+            f"{self.SPACER * 2}File {frame.filename}, "
+            f"line {frame.lineno}, in "
+            f"{frame.name}\n{self.SPACER * 2}{frame.line}"
+            for frame in extract_tb(exc.__traceback__)
         )
+
         return f"{self.SPACER}{exc.__class__.__name__}: {exc}\n{frames}"
 
 
